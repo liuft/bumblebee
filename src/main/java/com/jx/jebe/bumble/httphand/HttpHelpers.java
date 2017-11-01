@@ -5,5 +5,9 @@ package com.jx.jebe.bumble.httphand;
  */
 public class HttpHelpers {
 
+    public String logings(String username,String pwd)throws Exception{
+        String sessionid = "";
+        return sessionid;
+    }
 
 }
