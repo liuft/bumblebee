@@ -44,6 +44,16 @@
             <artifactId>com.bj58.spat.dao</artifactId>
             <version>1.0.3-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.jx.blackface</groupId>
+            <artifactId>servicetool</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.6</version>
+        </dependency>
     </dependencies>
 
 
