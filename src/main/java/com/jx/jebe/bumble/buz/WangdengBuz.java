@@ -3,6 +3,7 @@ package com.jx.jebe.bumble.buz;
 import com.jx.jebe.bumble.dao.DaoHandler;
 import com.jx.jebe.bumble.dao.entity.SetupTaskEnitty;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,5 +19,8 @@ public class WangdengBuz {
         setupTaskEnitty.setSetup_workflow_tid(taskid);
         return DaoHandler.daoHandler.insertGSTask(setupTaskEnitty);
     }
-
+    public List<SetupTaskEnitty> loadSetUplist(){
+        List<SetupTaskEnitty> stlist = null;
+        return stlist;
+    }
 }
