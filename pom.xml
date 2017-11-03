@@ -54,6 +54,12 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.6</version>
         </dependency>
+        <!-- 企业库服务 -->
+        <dependency>
+            <groupId>com.jx.service.enterprise</groupId>
+            <artifactId>enterprise-contract</artifactId>
+            <version>0.0.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 

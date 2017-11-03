@@ -48,4 +48,8 @@ public class WDHttpHandler {
         }
         return cookies;
     }
+    public void addnewsetup(String checknum,String checkcardno)throws Exception{
+        String url = "";
+
+    }
 }

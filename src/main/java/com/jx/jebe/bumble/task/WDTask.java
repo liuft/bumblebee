@@ -1,6 +1,7 @@
 package com.jx.jebe.bumble.task;
 
 
+import com.jx.jebe.bumble.buz.EnterpriseBuz;
 import com.jx.jebe.bumble.buz.WangdengBuz;
 import com.jx.jebe.bumble.dao.entity.SetupTaskEnitty;
 import com.jx.jebe.bumble.httphand.WDHttpHandler;
@@ -18,8 +19,11 @@ public class WDTask extends AbstractTask{
         if(null != list){
             for(SetupTaskEnitty se : list){
                 long account = se.getAcc_id();
-
+                String enterprise_id = se.getSetup_enterprise_id()+"";
                 String cookies = WDHttpHandler.loadWDHandler().getLoginCookie(account);
+
+                String checknumber = EnterpriseBuz.enterpriseBuz.getEntercheckedNameCode(enterprise_id);
+                String cardno = EnterpriseBuz.enterpriseBuz.getEntercheckedNameCerNo(enterprise_id);
 
             }
         }
