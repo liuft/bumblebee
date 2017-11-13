@@ -100,7 +100,7 @@ public class HttpHelpers {
         headers[7] = new BasicHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
         httpGet.setHeaders(headers);
         try {
-            response = request(url);
+            response = request(httpGet);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -109,8 +109,8 @@ public class HttpHelpers {
     }
 
 
-    public CloseableHttpResponse request(String url)throws Exception{
-        HttpGet httpGet = new HttpGet(url);
+    public CloseableHttpResponse request(HttpGet httpGet)throws Exception{
+//        HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = null;
         try {
             if(null != verfy_code && !"".equals(verfy_code)){
@@ -123,13 +123,7 @@ public class HttpHelpers {
                 beforecookies = cookieStore.getCookies();
             }
 
-            if (null != beforecookies) {
-                for (Cookie cookie : beforecookies) {
-                    System.out.println(url + " before  cookie " + cookie.getName() + "==" + cookie.getValue());
-                }
-            } else {
-                System.out.println(url + " before  cookie null.......");
-            }
+
 
             response = httpClient.execute(httpGet, context);
             List<Cookie> after = context.getCookieStore().getCookies();
@@ -137,7 +131,7 @@ public class HttpHelpers {
                 if(cookie.getName().equalsIgnoreCase("yunsuo_session_verify")){
                     verfy_code = cookie.getValue();
                 }
-                System.out.println(url + " after cookie " + cookie.getName() + "==" + cookie.getValue());
+
             }
         }catch (Exception e){
             if(null != response){
@@ -151,11 +145,9 @@ public class HttpHelpers {
         CloseableHttpResponse response = null;
         try {
 
-            response = request(url);
+            response = request(httpGet);
             HttpEntity entity = response.getEntity();
-
-
-
+            return EntityUtils.toString(entity);
         } catch (IOException e) {
             System.out.println("request url=" + url + ", exception, msg=" + e.getMessage());
             e.printStackTrace();
