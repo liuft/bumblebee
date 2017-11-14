@@ -89,18 +89,29 @@ public class HttpHelpers {
     public InputStream loadverfycode(String url)throws Exception{
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = null;
-        Header[] headers = new Header[8];
-        headers[0] = new BasicHeader("Accept","image/webp,image/apng,image/*,*/*;q=0.8");
-        headers[1] = new BasicHeader("Accept-Encoding",":gzip, deflate");
-        headers[2] = new BasicHeader("Accept-Language","zh-CN,zh;q=0.8");
-        headers[3] = new BasicHeader("Connection","keep-alive");
-        headers[4] = new BasicHeader("Cookie",getCookiestr());
-        headers[5] = new BasicHeader("Host","wsdj.baic.gov.cn");
-        headers[6] = new BasicHeader("Referer","http://wsdj.baic.gov.cn/");
-        headers[7] = new BasicHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
-        httpGet.setHeaders(headers);
+
+        httpGet.addHeader("Accept","image/webp,image/apng,image/*,*/*;q=0.8");
+        httpGet.addHeader("Accept-Encoding",":gzip, deflate");
+        httpGet.addHeader("Accept-Language","zh-CN,zh;q=0.8");
+        System.out.println(url+"            "+getCookiestr());
+        httpGet.addHeader("Cookie",getCookiestr());
+        httpGet.addHeader("Host","wsdj.baic.gov.cn");
+        httpGet.addHeader("Proxy-Connection","keep-alive");
+        httpGet.addHeader("Referer","http://wsdj.baic.gov.cn/");
+        httpGet.addHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
+
         try {
             response = request(httpGet);
+
+            Header[] responseAllHeaders = response.getAllHeaders();
+            if(null != responseAllHeaders && responseAllHeaders.length > 0){
+                StringBuilder sb = new StringBuilder();
+                for(Header header : responseAllHeaders){
+                    sb.append(header.getName()+"="+header.getValue());
+                    sb.append(";");
+                }
+                System.out.println("response "+url+" "+sb.toString());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -113,26 +124,9 @@ public class HttpHelpers {
 //        HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = null;
         try {
-            if(null != verfy_code && !"".equals(verfy_code)){
-                cookieStore.addCookie(new BasicClientCookie("yunsuo_session_verify",verfy_code));
-//                context.getCookieStore().addCookie(new BasicClientCookie("yunsuo_session_verify",verfy_code));
-            }
-
-            List<Cookie> beforecookies = null;
-            if (null != cookieStore) {
-                beforecookies = cookieStore.getCookies();
-            }
-
-
-
             response = httpClient.execute(httpGet, context);
-            List<Cookie> after = context.getCookieStore().getCookies();
-            for (Cookie cookie : after) {
-                if(cookie.getName().equalsIgnoreCase("yunsuo_session_verify")){
-                    verfy_code = cookie.getValue();
-                }
 
-            }
+
         }catch (Exception e){
             if(null != response){
                 response.close();
@@ -144,8 +138,28 @@ public class HttpHelpers {
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = null;
         try {
+            httpGet.addHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            httpGet.addHeader("Accept-Encoding","gzip, deflate");
+            httpGet.addHeader("Accept-Language","zh-CN,zh;q=0.8");
+            httpGet.addHeader("Cache-Control","max-age=0");
+            System.out.println(url+"        "+getCookiestr());
+            httpGet.addHeader("Cookie",getCookiestr());
+            httpGet.addHeader("Host","wsdj.baic.gov.cn");
+            httpGet.addHeader("Proxy-Connection","keep-alive");
+            httpGet.addHeader("Upgrade-Insecure-Requests","1");
+            httpGet.addHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
 
             response = request(httpGet);
+            Header[] responseAllHeaders = response.getAllHeaders();
+            if(null != responseAllHeaders && responseAllHeaders.length > 0){
+                StringBuilder sb = new StringBuilder();
+                for(Header header : responseAllHeaders){
+                    sb.append(header.getName()+"="+header.getValue());
+                    sb.append(";");
+                }
+                System.out.println("response "+url+" "+sb.toString());
+            }
+
             HttpEntity entity = response.getEntity();
             return EntityUtils.toString(entity);
         } catch (IOException e) {
@@ -163,9 +177,16 @@ public class HttpHelpers {
     public String postForm(String actionurl, Map<String,String> map)throws Exception{
         HttpPost post = new HttpPost(actionurl);
 //        CloseableHttpClient httpClient = HttpClients.createDefault();
-
+        post.addHeader("Accept","*/*");
+        post.addHeader("Accept-Encoding","gzip, deflate");
+        post.addHeader("Accept-Language","zh-CN,zh;q=0.8");
+//        post.addHeader("Content-Length","56");
         post.addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-        post.addHeader("Connection","keep-alive");
+        System.out.println(actionurl+"          "+getCookiestr());
+        post.addHeader("Cookie",getCookiestr());
+        post.addHeader("Host","wsdj.baic.gov.cn");
+        post.addHeader("Origin","http://wsdj.baic.gov.cn");
+        post.addHeader("Proxy-Connection","keep-alive");
         post.addHeader("Referer","http://wsdj.baic.gov.cn/");
         post.addHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
         post.addHeader("X-Requested-With","XMLHttpRequest");
@@ -197,13 +218,16 @@ public class HttpHelpers {
         HttpPost httpPost = new HttpPost(url);
         CloseableHttpResponse response = null;
 
-        httpPost.addHeader("Accept-Language","zh-CN,zh;q=0.8");
-        httpPost.addHeader("Accept-Encoding","gzip, deflate");
         httpPost.addHeader("Accept","*/*");
+        httpPost.addHeader("Accept-Encoding","gzip, deflate");
+        httpPost.addHeader("Accept-Language","zh-CN,zh;q=0.8");
+//        httpPost.addHeader("Content-Length","56");
+        httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+        System.out.println(url+"          "+getCookiestr());
         httpPost.addHeader("Cookie",getCookiestr());
         httpPost.addHeader("Host","wsdj.baic.gov.cn");
-        httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-        httpPost.addHeader("Connection","keep-alive");
+        httpPost.addHeader("Origin","http://wsdj.baic.gov.cn");
+        httpPost.addHeader("Proxy-Connection","keep-alive");
         httpPost.addHeader("Referer","http://wsdj.baic.gov.cn/");
         httpPost.addHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
         httpPost.addHeader("X-Requested-With","XMLHttpRequest");
@@ -231,6 +255,17 @@ public class HttpHelpers {
             httpPost.setEntity(requestEntity);
 
             response = httpClient.execute(httpPost, context);
+
+
+            Header[] responseAllHeaders = response.getAllHeaders();
+            if(null != responseAllHeaders && responseAllHeaders.length > 0){
+                StringBuilder sb = new StringBuilder();
+                for(Header header : responseAllHeaders){
+                    sb.append(header.getName()+"="+header.getValue());
+                    sb.append(";");
+                }
+                System.out.println("response "+url+" "+sb.toString());
+            }
 
             List<Cookie> after = context.getCookieStore().getCookies();
             for (Cookie cookie : after) {
