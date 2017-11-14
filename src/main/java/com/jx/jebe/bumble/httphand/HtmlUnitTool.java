@@ -22,25 +22,34 @@ import java.util.*;
 public class HtmlUnitTool {
 
     public static void main(String[] argo){
-        WebClient wc = new WebClient(BrowserVersion.FIREFOX_45);
+        WebClient wc = new WebClient(BrowserVersion.FIREFOX_45,"127.0.0.1",8888);
+
         wc.getOptions().setJavaScriptEnabled(true);
-        wc.getOptions().setThrowExceptionOnScriptError(false);
-        wc.getOptions().setCssEnabled(false);
+        wc.getOptions().setThrowExceptionOnScriptError(true);
+        wc.getOptions().setCssEnabled(true);
+
+        wc.getOptions().setRedirectEnabled(true);
+        wc.getCookieManager().setCookiesEnabled(true);
         wc.setAjaxController(new NicelyResynchronizingAjaxController());
         wc.getOptions().setTimeout(30000);
 
         HtmlPage page = null;
         try {
             page = wc.getPage("http://wsdj.baic.gov.cn");
+//            wc.getWebConnection().getResponse(new Http);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(page != null){
-            DomElement login_name = page.getElementById("login_name");
-            DomElement password = page.getElementById("user_pwd");
-            DomElement verify_code = page.getElementById("verify_code");
+
+       System.out.println(page.getWebResponse().getContentAsString());
 
 
+//        if(page != null){
+//            DomElement login_name = page.getElementById("login_name");
+//            DomElement password = page.getElementById("user_pwd");
+//            DomElement verify_code = page.getElementById("verify_code");
+//
+//
             String ret_code = "";
             HtmlImage image = (HtmlImage) page.getElementById("verify-code");
             try {
@@ -51,18 +60,20 @@ public class HtmlUnitTool {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            System.out.println(ret_code);
-            //page.getElementById("verify-code").getAttribute("src").getBytes();
-            login_name.setNodeValue("robbin1995");
-            password.setNodeValue("XWLZ2017");
-            verify_code.setNodeValue(ret_code);
-
-            try {
-                HtmlPage pp = page.getElementById("btnCheck").click();
-                System.out.println(pp.asXml());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            System.out.println(ret_code);
+//            //page.getElementById("verify-code").getAttribute("src").getBytes();
+//            login_name.setAttribute("value","robbin1995");//.setNodeValue("robbin1995");
+//            password.setAttribute("value","XWLZ2017");//.setNodeValue("XWLZ2017");
+//            verify_code.setAttribute("value",ret_code);
+//
+//            try {
+//                HtmlPage pp = page.getElementById("btnCheck").click();
+////                Object pp =  page.executeJavaScript("login()").getJavaScriptResult();
+//                wc.waitForBackgroundJavaScript(3000l);
+//                System.out.println(pp.asText());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
 //            try {
 //                WebRequest request =  new WebRequest(new URL("http://wsdj.baic.gov.cn/system/login.do"));
@@ -98,6 +109,6 @@ public class HtmlUnitTool {
 //            System.out.println(sr.getNewPage().getWebResponse().getContentAsString());
 //            System.out.println("*********/--------------");
 //            System.out.println("cookie"+wc.getCookieManager().getCookies().toString());
-        }
+//        }
     }
 }
