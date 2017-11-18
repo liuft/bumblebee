@@ -4,9 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.jx.jebe.bumble.buz.AccountBuz;
+import com.jx.jebe.bumble.buz.EnterpriseBuz;
 import com.jx.jebe.bumble.buz.WangdengBuz;
 import com.jx.jebe.bumble.dao.entity.GSAccountEntity;
 import com.jx.jebe.bumble.dao.entity.SetupTaskEnitty;
+import com.jx.service.enterprise.entity.LvEnterpriseEntity;
+import com.jx.service.enterprise.entity.LvEnterprisePersonEntity;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -26,32 +29,33 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by xiaowei on 17/11/2.
  */
 public class WDHttpHandler {
-    public WDHttpHandler(){
+    private WDHttpHandler(){
 
     }
     private static final String start_new_wangdeng_url = "http://wsdj.baic.gov.cn/page/company/add/set_up_my_names.html";
     //企业基本信息
     private static  String enterprise_basic_info_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/basic_info.html";
     //企业股东信息
-    private static  String Share_holder_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/inv.html?gid=7b53aabf46b84a84964ede956c61174e";
+    private static  String Share_holder_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/inv.html";
     //主要人员信息
-    private static  String main_member_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/member.html?gid=7b53aabf46b84a84964ede956c61174e";
+    private static  String main_member_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/member.html";
     //企业联系人信息
-    private static  String contact_info_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/contact.html?gid=7b53aabf46b84a84964ede956c61174e";
+    private static  String contact_info_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/contact.html";
     //文件上传
-    private static  String file_upload_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/upload.html?gid=7b53aabf46b84a84964ede956c61174e";
+    private static  String file_upload_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/upload.html";
     //补充信息
-    private static  String ext_info_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/entsnd.html?gid=7b53aabf46b84a84964ede956c61174e";
+    private static  String ext_info_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/entsnd.html";
     //备案填报
-    private static  String ent_ba_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/entba.html?gid=7b53aabf46b84a84964ede956c61174e";
+    private static  String ent_ba_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/entba.html";
     //预览页面
-    private static  String pre_view_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/preview.html?gid=7b53aabf46b84a84964ede956c61174e";
+    private static  String pre_view_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/preview.html";
 
 
     private static WDHttpHandler wdHttpHandler = null;
@@ -188,10 +192,18 @@ public class WDHttpHandler {
     public String basicInfo(SetupTaskEnitty se)throws Exception{
         String ret = "";
         enterprise_basic_info_url = enterprise_basic_info_url + "??gid="+se.getEnter_id();
+
+        if(se == null)
+            return ret;
+
+        LvEnterpriseEntity lvEnterpriseEntity = EnterpriseBuz.enterpriseBuz.getEnterpriseBasicInfo(se.getSetup_enterprise_id());
+
         HtmlPage base_page = HtmlUnitTool.getHtmlTool().getPage(enterprise_basic_info_url);
         if(base_page != null){
 
         }
+
+
 
         if(se != null){
             se.setCurrent_step(2);
@@ -209,6 +221,16 @@ public class WDHttpHandler {
      */
     public String shareHolderInfo(SetupTaskEnitty se)throws Exception{
         String ret = "";
+
+
+        List<LvEnterprisePersonEntity> slist = EnterpriseBuz.enterpriseBuz.getShareHolderList(se.getSetup_enterprise_id());
+        if(null != slist && slist.size() > 0){
+            HtmlPage page = HtmlUnitTool.getHtmlTool().getPage(Share_holder_url+"?gid="+se.getEnter_id());
+            for(LvEnterprisePersonEntity lvp : slist){
+
+            }
+        }
+
         if(se != null){
             se.setCurrent_step(3);
             WangdengBuz.wdbuz.updateTaskEntity(se);
