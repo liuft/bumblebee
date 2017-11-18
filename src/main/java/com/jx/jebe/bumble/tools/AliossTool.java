@@ -25,9 +25,6 @@ public class AliossTool {
         OSSObject obj = client.getObject(bucket_name,"AppSignComfirmation_20171109163347_60f41b69-3edc-4793-a179-85aa515126a7.jpg");
         InputStream inputStream = obj.getObjectContent();
 
-        BufferedImage bufferedImage = null;
-
-        byte[] data = null;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] buf = new byte[1024];
         int numberbytesread = 0;
@@ -35,17 +32,16 @@ public class AliossTool {
             outputStream.write(buf,0,numberbytesread);
         }
 
-        data = outputStream.toByteArray();
+        byte[] data = outputStream.toByteArray();
         outputStream.close();
         inputStream.close();
 
-
         InputStream stream = new ByteArrayInputStream(data);
 
-        bufferedImage = ImageIO.read(stream);
+        BufferedImage bufferedImage = ImageIO.read(stream);
 
         try {
-            ImageIO.write(bufferedImage,"jpeg",new File("/opt/tiantian.jpeg"));
+            ImageIO.write(bufferedImage,"jpeg",new File("/opt/velotiy.jpeg"));
         } catch (IOException e) {
             e.printStackTrace();
         }
