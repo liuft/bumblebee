@@ -30,6 +30,26 @@ public class SetupTaskEnitty {
     private int setup_task_state;
     @Column(name = "setup_task_sucdate")
     private Date setup_task_sucdate;
+    @Column(name = "enter_id")
+    private String enter_id;
+    @Column(name = "current_step")
+    private int current_step;
+
+    public String getEnter_id() {
+        return enter_id;
+    }
+
+    public void setEnter_id(String enter_id) {
+        this.enter_id = enter_id;
+    }
+
+    public int getCurrent_step() {
+        return current_step;
+    }
+
+    public void setCurrent_step(int current_step) {
+        this.current_step = current_step;
+    }
 
     public long getSetup_id() {
         return setup_id;

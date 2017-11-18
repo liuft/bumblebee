@@ -20,7 +20,44 @@ import java.net.URL;
 import java.util.*;
 
 public class HtmlUnitTool {
+    private static WebClient wc = new WebClient();
+    private static HtmlUnitTool tool = null;
+    private static Object lock = new Object();
+    private HtmlUnitTool(){
+        wc.getOptions().setJavaScriptEnabled(true);
+        wc.getOptions().setThrowExceptionOnScriptError(true);
+        wc.getOptions().setCssEnabled(true);
 
+        wc.getOptions().setRedirectEnabled(true);
+        wc.getCookieManager().setCookiesEnabled(true);
+        wc.setAjaxController(new NicelyResynchronizingAjaxController());
+        wc.getOptions().setTimeout(30000);
+    }
+    public static HtmlUnitTool getHtmlTool(){
+        if(null == tool){
+            synchronized (lock){
+                if(null == tool){
+                    tool = new HtmlUnitTool();
+                }
+            }
+        }
+        return tool;
+    }
+    public HtmlPage getPage(String url)throws Exception{
+
+        return wc.getPage(url);
+    }
+
+    /**
+     * 设立提交申请
+     * @param page
+     * @return
+     * @throws Exception
+     */
+    public String sendSetup(HtmlPage page)throws Exception{
+        String enterpriseid = "";
+        return enterpriseid;
+    }
     public static void main(String[] argo){
         WebClient wc = new WebClient(BrowserVersion.FIREFOX_45,"127.0.0.1",8888);
 
