@@ -191,15 +191,43 @@ public class WDHttpHandler {
      */
     public String basicInfo(SetupTaskEnitty se)throws Exception{
         String ret = "";
-        enterprise_basic_info_url = enterprise_basic_info_url + "??gid="+se.getEnter_id();
+        enterprise_basic_info_url = enterprise_basic_info_url + "?gid="+se.getEnter_id();
 
         if(se == null)
             return ret;
 
         LvEnterpriseEntity lvEnterpriseEntity = EnterpriseBuz.enterpriseBuz.getEnterpriseBasicInfo(se.getSetup_enterprise_id());
 
+
+
         HtmlPage base_page = HtmlUnitTool.getHtmlTool().getPage(enterprise_basic_info_url);
         if(base_page != null){
+            //注册资本
+            base_page.getElementById("comp_j_12890644_1017_input").setNodeValue(lvEnterpriseEntity.getRegCapital());
+            //营业期限
+            base_page.getElementById("comp_j_05158801_1018_out").setNodeValue(EnterpriseBuz.enterpriseBuz.getBussinessDuration(lvEnterpriseEntity.getEnterpriseId()));
+            //是否属于特殊行业
+            base_page.getElementById("comp_j_75387240_1019_text").setNodeValue("不是特殊行业");
+            //住所(经营场所)
+            base_page.getElementById("comp_j_51043267_1021_input").setNodeValue(lvEnterpriseEntity.getAddressFormat());
+            //生成经营地
+            base_page.getElementById("comp_j_50507866_1023_input").setNodeValue(lvEnterpriseEntity.getAddressFormat());
+            //住所产权人
+            base_page.getElementById("comp_j_91287559_1024_input").setNodeValue(EnterpriseBuz.enterpriseBuz.getOwenerName(lvEnterpriseEntity.getEnterpriseId()));
+            //住所产权类型
+            base_page.getElementById("comp_j_37967443_1025_text").setNodeValue("有房产证");
+            //是否在以下区域
+            base_page.getElementById("comp_j_77573978_1028_text").setNodeValue("");
+            //房屋用途
+            base_page.getElementById("comp_j_60393665_1030_text").setNodeValue("商业");
+            //*是否市级国有资产监督管理机构履行出资人职责的公司以及该公司设立的控股50%以上的公司：
+            base_page.getElementById("comp_j_02642723_1031_input").setNodeValue("0");
+            //执照副本数
+            base_page.getElementById("comp_j_55509076_1032_input").setNodeValue("1");
+
+            //经营范围
+            base_page.getElementById("comp_j_84941608_1040_input").setNodeValue(lvEnterpriseEntity.getOperatingRange());
+            base_page.getElementById("comp_j_84941608_1040_input").blur();
 
         }
 
@@ -263,10 +291,35 @@ public class WDHttpHandler {
      */
     public String contactInfo(SetupTaskEnitty se)throws Exception{
         String ret = "";
+
+        LvEnterpriseEntity enterpriseEntity =EnterpriseBuz.enterpriseBuz.getEnterpriseBasicInfo(se.getSetup_enterprise_id());
+        HtmlPage contact_page = HtmlUnitTool.getHtmlTool().getPage(contact_info_url+"?gid="+se.getEnter_id());
+        if(null != contact_page){
+            LvEnterprisePersonEntity contact_person = EnterpriseBuz.enterpriseBuz.getEnterpriseContacts(se.getSetup_enterprise_id());
+            LvEnterprisePersonEntity final_contact = EnterpriseBuz.enterpriseBuz.getEnterpriseFinalContact(se.getSetup_enterprise_id());
+
+            contact_page.getElementById("comp_j_57649086_1003_text").setNodeValue(contact_person.getName());
+            contact_page.getElementById("comp_j_55136522_1005_input").setNodeValue(contact_person.getIdType());
+            contact_page.getElementById("comp_j_52029036_1006_input").setNodeValue(contact_person.getIdNum());
+            contact_page.getElementById("comp_j_58672077_1007_input").setNodeValue(contact_person.getPhoneNum());
+            contact_page.getElementById("comp_j_15078009_1008_input").setNodeValue(contact_person.getFixedPhone());
+            contact_page.getElementById("comp_j_05103545_1009_input").setNodeValue(contact_person.getEmail());
+
+            contact_page.getElementById("comp_j_20051369_1012_text").setNodeValue(final_contact.getName());
+            contact_page.getElementById("comp_j_01681784_1014_input").setNodeValue(final_contact.getIdType());
+            contact_page.getElementById("comp_j_61445331_1015_input").setNodeValue(final_contact.getIdNum());
+            contact_page.getElementById("comp_j_77565821_1016_input").setNodeValue(final_contact.getPhoneNum());
+        }
+
+
+
         if(se != null){
             se.setCurrent_step(5);
             WangdengBuz.wdbuz.updateTaskEntity(se);
         }
+
+
+
         fileUploadInfo(se);
         return ret;
     }

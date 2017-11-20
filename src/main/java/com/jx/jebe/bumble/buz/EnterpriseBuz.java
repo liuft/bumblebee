@@ -1,10 +1,8 @@
 package com.jx.jebe.bumble.buz;
 
 import com.jx.jebe.bumble.service.ServiceFactory;
-import com.jx.service.enterprise.contract.ILvEnterpriseDicDataService;
-import com.jx.service.enterprise.contract.ILvEnterprisePersonService;
-import com.jx.service.enterprise.contract.ILvEnterpriseRoleRelationService;
-import com.jx.service.enterprise.contract.ILvEnterpriseService;
+import com.jx.service.enterprise.contract.*;
+import com.jx.service.enterprise.entity.LvEnterpriseAddressTemplateEntity;
 import com.jx.service.enterprise.entity.LvEnterpriseEntity;
 import com.jx.service.enterprise.entity.LvEnterprisePersonEntity;
 import com.jx.service.enterprise.entity.LvEnterpriseRoleRelationEntity;
@@ -22,6 +20,8 @@ public class EnterpriseBuz {
     private static ILvEnterpriseDicDataService eds = ServiceFactory.getLvEnterpriseDicDataService();
     private static ILvEnterprisePersonService eps = ServiceFactory.getLvEnterprisePersonService();
     private static ILvEnterpriseRoleRelationService ers = ServiceFactory.getLvEnterpriseRoleRelationService();
+    private static ILvEnterpriseAddressService ars = ServiceFactory.getLvEnterpriseAddressService();
+    private static ILvEnterpriseAddressTemplateService ats = ServiceFactory.getLvEnterpriseAddressTemplateService();
 
     /**
      * 获取企业核名已核批准号
@@ -31,6 +31,29 @@ public class EnterpriseBuz {
      */
     public String getEntercheckedNameCode(String enterpriseid)throws Exception{
        return es.getExtValueByEnterpriseIdAndKey(enterpriseid,"checkedNameCode");
+    }
+
+    public LvEnterprisePersonEntity getEnterpriseFinalContact(long enterpriseid)throws Exception{
+        LvEnterprisePersonEntity personEntity= null;
+        List<LvEnterprisePersonEntity> list = eps.getPersonListByEnterpriseIdAndRoleType(enterpriseid,"finance");
+        if(null != list && list.size() > 0){
+            personEntity = list.get(0);
+        }
+        return personEntity;
+    }
+    /**
+     * 企业联系人
+     * @param enterpriseid
+     * @return
+     * @throws Exception
+     */
+    public LvEnterprisePersonEntity getEnterpriseContacts(long enterpriseid)throws Exception{
+        LvEnterprisePersonEntity personEntity = null;
+        List<LvEnterprisePersonEntity> list = eps.getPersonListByEnterpriseIdAndRoleType(enterpriseid,"contacts");
+        if(null != list && list.size() > 0){
+            personEntity = list.get(0);
+        }
+        return personEntity;
     }
 
     /**
@@ -43,6 +66,38 @@ public class EnterpriseBuz {
         return es.getEnterpriseById(enterpriseid);
     }
 
+    /**
+     * 获取产权所有人
+     * @param enterpriseid
+     * @return
+     * @throws Exception
+     */
+    public String getOwenerName(long enterpriseid)throws Exception{
+
+        String holdername = "";
+        //先获取地址类型
+        String addtype = es.getExtValueByEnterpriseIdAndKey(enterpriseid+"","addressType");
+        //addtyp 1,孵化器地址 2，自有地址
+        if("1".equals(addtype)){
+            LvEnterpriseAddressTemplateEntity lvEnterpriseAddressTemplateEntity = ats.getEnterpriseAddressTemplateByEnterpriseId(enterpriseid+"");
+            if(null != lvEnterpriseAddressTemplateEntity){
+                holdername = lvEnterpriseAddressTemplateEntity.getTheOwnerName();
+            }
+        }else if("2".equals(addtype)){
+            holdername = ars.getEnterpriseAddressDataMapByEnterpriseIdAndDataKey(enterpriseid,"theOwnerName");
+        }
+        return holdername;
+    }
+    /**
+     *
+     * @param enterpriseid
+     * @return
+     * @throws Exception
+     */
+    public String getBussinessDuration(long enterpriseid)throws Exception{
+
+        return "20";
+    }
     /**
      * 获取股东信息
      * @param enterpriseid

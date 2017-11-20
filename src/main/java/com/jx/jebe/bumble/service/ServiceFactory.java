@@ -1,9 +1,6 @@
 package com.jx.jebe.bumble.service;
 
-import com.jx.service.enterprise.contract.ILvEnterpriseDicDataService;
-import com.jx.service.enterprise.contract.ILvEnterprisePersonService;
-import com.jx.service.enterprise.contract.ILvEnterpriseRoleRelationService;
-import com.jx.service.enterprise.contract.ILvEnterpriseService;
+import com.jx.service.enterprise.contract.*;
 
 /**
  * Created by xiaowei on 17/11/2.
@@ -13,6 +10,12 @@ public class ServiceFactory {
 
     }
 
+    public static ILvEnterpriseAddressTemplateService getLvEnterpriseAddressTemplateService(){
+        return null;
+    }
+    public static ILvEnterpriseAddressService getLvEnterpriseAddressService(){
+        return null;
+    }
     public static ILvEnterpriseService getLvEnterpriseService(){
         return null;
     }
