@@ -3,6 +3,7 @@ package com.jx.jebe.bumble.httphand;
 import com.alibaba.fastjson.JSONObject;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.jx.jebe.bumble.beans.PersonExtEntity;
 import com.jx.jebe.bumble.buz.AccountBuz;
 import com.jx.jebe.bumble.buz.EnterpriseBuz;
 import com.jx.jebe.bumble.buz.WangdengBuz;
@@ -268,17 +269,23 @@ public class WDHttpHandler {
                 if(nameDom != null){
                     String holder_name = nameDom.asText();
                     lve = pmap.get(holder_name);
-                    if(lve != null){
+                    PersonExtEntity personExtEntity = EnterpriseBuz.enterpriseBuz.loadPersonExtBypersonidAndEnterpriseid(lve.getId(),se.getSetup_enterprise_id());
+
+                    if(lve != null && personExtEntity != null){
                         HtmlPage npp = dom.click();
 
                         //身份证号
                         npp.getElementById("comp_j_49475201_1008_input").setNodeValue(lve.getIdNum());
                         //民族
-                        npp.getElementById("comp_j_57562681_1010_input");
+                        npp.getElementById("comp_j_57562681_1010_input").setNodeValue(personExtEntity.getMz_code());
                         //省份
-                        npp.getElementById("comp_j_04391941_1014_input");
+                        npp.getElementById("comp_j_04391941_1014_input").setNodeValue(personExtEntity.getProvnice_code());
                         //具体地址
-                        npp.getElementById("comp_j_26570285_1016_input");
+                        npp.getElementById("comp_j_26570285_1016_input").setNodeValue(personExtEntity.getId_address());
+
+                        npp.getElementById("comp_j_46491663_1018_input").setNodeValue(personExtEntity.getChuzi());
+                        npp.getElementById("comp_j_97250463_1019_input").setNodeValue(personExtEntity.getChuzi_type());
+                        npp.getElementById("comp_j_61157142_1020_text").setNodeValue(personExtEntity.getChuzi_time());
 
                         //保存按钮
                         npp.getElementById("applySetupInvPersonEdit_query_button").click();

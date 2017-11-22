@@ -1,5 +1,6 @@
 package com.jx.jebe.bumble.buz;
 
+import com.jx.jebe.bumble.beans.PersonExtEntity;
 import com.jx.jebe.bumble.service.ServiceFactory;
 import com.jx.service.enterprise.contract.*;
 import com.jx.service.enterprise.entity.LvEnterpriseAddressTemplateEntity;
@@ -40,6 +41,18 @@ public class EnterpriseBuz {
             personEntity = list.get(0);
         }
         return personEntity;
+    }
+
+    /**
+     * 根据人员id，企业库id
+     * @param personid
+     * @param enterpriseid
+     * @return
+     * @throws Exception
+     */
+    public PersonExtEntity loadPersonExtBypersonidAndEnterpriseid(long personid,long enterpriseid)throws Exception{
+        PersonExtEntity pee = null;
+        return pee;
     }
     /**
      * 企业联系人
