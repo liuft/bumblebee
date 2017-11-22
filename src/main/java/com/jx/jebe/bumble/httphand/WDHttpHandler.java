@@ -27,10 +27,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 
 /**
  * Created by xiaowei on 17/11/2.
@@ -252,12 +250,45 @@ public class WDHttpHandler {
 
 
         List<LvEnterprisePersonEntity> slist = EnterpriseBuz.enterpriseBuz.getShareHolderList(se.getSetup_enterprise_id());
+
         if(null != slist && slist.size() > 0){
+            Map<String,LvEnterprisePersonEntity> pmap = new HashMap<String, LvEnterprisePersonEntity>();
+            for(LvEnterprisePersonEntity lve : slist){
+                pmap.put(lve.getName(),lve);
+            }
+
             HtmlPage page = HtmlUnitTool.getHtmlTool().getPage(Share_holder_url+"?gid="+se.getEnter_id());
-            for(LvEnterprisePersonEntity lvp : slist){
+            DomElement parent = page.getElementById("personList").getNextElementSibling();
+            Iterable<DomElement> it = parent.getChildElements();
+            Iterator iterable = it.iterator();
+            while (iterable.hasNext()){
+                LvEnterprisePersonEntity lve = null;
+                DomElement dom = (DomElement) iterable.next();
+                DomElement nameDom = dom.getElementsByTagName("p").get(0);
+                if(nameDom != null){
+                    String holder_name = nameDom.asText();
+                    lve = pmap.get(holder_name);
+                    if(lve != null){
+                        HtmlPage npp = dom.click();
+
+                        //身份证号
+                        npp.getElementById("comp_j_49475201_1008_input").setNodeValue(lve.getIdNum());
+                        //民族
+                        npp.getElementById("comp_j_57562681_1010_input");
+                        //省份
+                        npp.getElementById("comp_j_04391941_1014_input");
+                        //具体地址
+                        npp.getElementById("comp_j_26570285_1016_input");
+
+                        //保存按钮
+                        npp.getElementById("applySetupInvPersonEdit_query_button").click();
+                    }
+                }
 
             }
+
         }
+
 
         if(se != null){
             se.setCurrent_step(3);
@@ -348,6 +379,25 @@ public class WDHttpHandler {
      */
     public String extMessageInfo(SetupTaskEnitty se)throws Exception{
         String ret = "";
+
+        if(se == null)
+            return ret;
+        HtmlPage message_page = HtmlUnitTool.getHtmlTool().getPage(ext_info_url+"?gid="+se.getEnter_id());
+        if(null == message_page)
+            return ret;
+
+
+        //从业人数
+        message_page.getElementById("comp_j_45693887_1015_input");
+        //本市人数
+        message_page.getElementById("comp_j_22648004_1016_input");
+        //外地人数
+        message_page.getElementById("comp_j_37000686_1017_input");
+        //其中女性人数
+        message_page.getElementById("comp_j_95617940_1018_input");
+        //安置下岗失业人数
+        message_page.getElementById("comp_j_84490117_1019_input");
+
         if(se != null){
             se.setCurrent_step(7);
             WangdengBuz.wdbuz.updateTaskEntity(se);
