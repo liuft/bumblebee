@@ -160,10 +160,15 @@ public class WDHttpHandler {
      */
     public String addnewsetup(String checknum,String checkcardno,SetupTaskEnitty se)throws Exception{
         String url = "";
+
+        if(null == checknum || "".equals(checknum) || null == checkcardno || "".equals(checkcardno))
+            return url;
+
         String checknuminput = "comp_j_notNo_1006_text";
         String checkcardoinput = "comp_j_cerNo_1007_input";
 
         HtmlPage page = HtmlUnitTool.getHtmlTool().getPage(start_new_wangdeng_url);
+
         DomElement checknumbdom = page.getElementById(checknuminput);
         DomElement checkcarddom = page.getElementById(checkcardoinput);
 

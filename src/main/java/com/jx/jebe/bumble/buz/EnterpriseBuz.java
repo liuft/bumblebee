@@ -10,6 +10,8 @@ import com.jx.service.enterprise.entity.LvEnterpriseRoleRelationEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by xiaowei on 17/11/2.
@@ -31,7 +33,23 @@ public class EnterpriseBuz {
      * @throws Exception
      */
     public String getEntercheckedNameCode(String enterpriseid)throws Exception{
-       return es.getExtValueByEnterpriseIdAndKey(enterpriseid,"checkedNameCode");
+        String str_temp = "(京怀)名称预核(内)字[2017]第0413843号";//es.getExtValueByEnterpriseIdAndKey(enterpriseid,"checkedNameCode");
+        String ret = "";
+        Pattern pattern = Pattern.compile("\\d{7}");
+        Matcher matcher = pattern.matcher(str_temp);
+        if(matcher.find()){
+            ret = matcher.group();
+        }
+
+       return ret;
+    }
+    public static void main(String[] args){
+        try {
+            System.out.println(EnterpriseBuz.enterpriseBuz.getEntercheckedNameCode(""));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public LvEnterprisePersonEntity getEnterpriseFinalContact(long enterpriseid)throws Exception{
