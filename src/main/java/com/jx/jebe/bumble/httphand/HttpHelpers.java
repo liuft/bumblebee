@@ -1,13 +1,9 @@
 package com.jx.jebe.bumble.httphand;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.jx.jebe.bumble.tools.TestTess4j;
-import net.sourceforge.tess4j.ITesseract;
-import net.sourceforge.tess4j.Tesseract;
-import net.sourceforge.tess4j.TesseractException;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.RequestConfig;
@@ -17,19 +13,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.*;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.entity.ByteArrayEntity;
 
-import javax.imageio.ImageIO;
+import org.apache.http.impl.client.*;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -54,7 +44,9 @@ public class HttpHelpers {
                 setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy()).
                 setRedirectStrategy(new DefaultRedirectStrategy()).
                 setDefaultRequestConfig(requestConfig).
-                setDefaultCookieStore(cookieStore).build();
+                setDefaultCookieStore(cookieStore).
+                setProxy(new HttpHost("127.0.0.1",8888,null)).
+                build();
     }
 
     private HttpHelpers(){
@@ -73,6 +65,15 @@ public class HttpHelpers {
         return httpHelpers;
     }
 
+    public static void main(String[] args){
+        String login_url = "http://wsdj.baic.gov.cn/system/login.do";
+        String body = "login_name=robbin1995&user_pwd=XWLZ2017&verify_code=vlh6";
+        try {
+            System.out.println(HttpHelpers.getHttpHelpers().sendPostRequest(login_url,body));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     private String getCookiestr()throws Exception{
         StringBuilder sb = new StringBuilder();
         if(cookieStore != null){
@@ -88,6 +89,7 @@ public class HttpHelpers {
     }
     public InputStream loadverfycode(String url)throws Exception{
         HttpGet httpGet = new HttpGet(url);
+
         CloseableHttpResponse response = null;
 
         httpGet.addHeader("Accept","image/webp,image/apng,image/*,*/*;q=0.8");
@@ -123,6 +125,7 @@ public class HttpHelpers {
     public CloseableHttpResponse request(HttpGet httpGet)throws Exception{
 //        HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = null;
+
         try {
             response = httpClient.execute(httpGet, context);
 
@@ -224,7 +227,8 @@ public class HttpHelpers {
 //        httpPost.addHeader("Content-Length","56");
         httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
         System.out.println(url+"          "+getCookiestr());
-        httpPost.addHeader("Cookie",getCookiestr());
+//        httpPost.addHeader("Cookie",getCookiestr());
+        httpPost.addHeader("Cookie","Cookie: SESSION=ef1aed13-e576-47f4-b869-217e551a27dc; yunsuo_session_verify=e0eff6d66750a68710ede97b53930ff2");
         httpPost.addHeader("Host","wsdj.baic.gov.cn");
         httpPost.addHeader("Origin","http://wsdj.baic.gov.cn");
         httpPost.addHeader("Proxy-Connection","keep-alive");
@@ -250,9 +254,11 @@ public class HttpHelpers {
             } else {
                 System.out.println(url + " before  cookie null.......");
             }
-            StringEntity requestEntity = new StringEntity(JSON.toJSONString(data), "utf-8");
+//            StringEntity requestEntity = new StringEntity(JSON.toJSONString(data), "utf-8");
+            String datastr = data.toString();
 
-            httpPost.setEntity(requestEntity);
+            ByteArrayEntity byteArrayEntity = new ByteArrayEntity(datastr.getBytes());
+            httpPost.setEntity(byteArrayEntity);
 
             response = httpClient.execute(httpPost, context);
 

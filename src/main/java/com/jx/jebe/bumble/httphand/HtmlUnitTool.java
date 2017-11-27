@@ -6,7 +6,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlImage;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
-import net.sourceforge.tess4j.Tesseract;
+
 
 
 import javax.imageio.ImageIO;
@@ -24,8 +24,8 @@ public class HtmlUnitTool {
     private static HtmlUnitTool tool = null;
     private static Object lock = new Object();
     private HtmlUnitTool(){
-//        wc = new WebClient(BrowserVersion.FIREFOX_45,"127.0.0.1",8888);
-        wc = new WebClient();
+        wc = new WebClient(BrowserVersion.FIREFOX_45,"127.0.0.1",8888);
+//        wc = new WebClient();
         wc.getOptions().setJavaScriptEnabled(true);
         wc.getOptions().setThrowExceptionOnScriptError(true);
         wc.getOptions().setCssEnabled(true);
@@ -102,16 +102,16 @@ public class HtmlUnitTool {
 //            DomElement verify_code = page.getElementById("verify_code");
 //
 //
-            String ret_code = "";
-            HtmlImage image = (HtmlImage) page.getElementById("verify-code");
-            try {
-                ImageReader reader = image.getImageReader();
-                BufferedImage bufferedImage = reader.read(0);
-                ret_code = new Tesseract().doOCR(bufferedImage);
-                ImageIO.write(bufferedImage,"jpg",new File("d:\\ttt.jpg"));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            String ret_code = "";
+//            HtmlImage image = (HtmlImage) page.getElementById("verify-code");
+//            try {
+//                ImageReader reader = image.getImageReader();
+//                BufferedImage bufferedImage = reader.read(0);
+//                ret_code = new Tesseract().doOCR(bufferedImage);
+//                ImageIO.write(bufferedImage,"jpg",new File("d:\\ttt.jpg"));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 //            System.out.println(ret_code);
 //            //page.getElementById("verify-code").getAttribute("src").getBytes();
 //            login_name.setAttribute("value","robbin1995");//.setNodeValue("robbin1995");

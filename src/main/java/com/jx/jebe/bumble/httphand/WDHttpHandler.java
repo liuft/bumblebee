@@ -15,15 +15,13 @@ import com.jx.jebe.bumble.dao.entity.GSAccountEntity;
 import com.jx.jebe.bumble.dao.entity.SetupTaskEnitty;
 import com.jx.service.enterprise.entity.LvEnterpriseEntity;
 import com.jx.service.enterprise.entity.LvEnterprisePersonEntity;
-import net.sourceforge.tess4j.ITesseract;
+
 import net.sourceforge.tess4j.Tesseract;
-import net.sourceforge.tess4j.TesseractException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 
 import javax.imageio.ImageIO;
@@ -108,13 +106,10 @@ public class WDHttpHandler {
         try {
             checknumber = EnterpriseBuz.enterpriseBuz.getEntercheckedNameCode("908764");
             String cardno = EnterpriseBuz.enterpriseBuz.getEntercheckedNameCerNo("908764");
-            System.out.println(HttpClientBuilder.class.getProtectionDomain().getCodeSource().getLocation());
             WDHttpHandler.loadWDHandler().addnewsetup(checknumber,cardno,null);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
 
     }
     private String readVerfiycode() {

@@ -1,6 +1,6 @@
 package com.jx.jebe.bumble.tools;
 
-import net.sourceforge.tess4j.ITesseract;
+
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.apache.http.client.methods.CloseableHttpResponse;
