@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -24,11 +25,11 @@ public class HtmlUnitTool {
     private static HtmlUnitTool tool = null;
     private static Object lock = new Object();
     private HtmlUnitTool(){
-        wc = new WebClient(BrowserVersion.FIREFOX_45,"127.0.0.1",8888);
+        wc = new WebClient(BrowserVersion.CHROME,"127.0.0.1",8888);
 //        wc = new WebClient();
         wc.getOptions().setJavaScriptEnabled(true);
-        wc.getOptions().setThrowExceptionOnScriptError(true);
-        wc.getOptions().setCssEnabled(true);
+        wc.getOptions().setThrowExceptionOnScriptError(false);
+        wc.getOptions().setCssEnabled(false);
 
         wc.getOptions().setRedirectEnabled(true);
         wc.getCookieManager().setCookiesEnabled(true);
@@ -47,29 +48,12 @@ public class HtmlUnitTool {
         return tool;
     }
     public HtmlPage getPage(String url)throws Exception{
-        HtmlPage page = null;
-        try {
-            page = wc.getPage("http://wsdj.baic.gov.cn");
-//            wc.getWebConnection().getResponse(new Http);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if(page != null){
-            DomElement login_name = page.getElementById("login_name");
-            DomElement password = page.getElementById("user_pwd");
-            DomElement verify_code = page.getElementById("verify_code");
 
-            login_name.setAttribute("value","robbin1995");
-            password.setAttribute("value","XWLZ2017");
-            verify_code.setAttribute("value","076T");
-
-            wc.getCookieManager().clearCookies();
-            wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","yunsuo_session_verify","d7055eb88596115ec4158311a6132673"));
-            wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","SESSION","b03e6cfb-f872-4f6b-89e0-24f9601df21d"));
-
-            page.getElementById("btnCheck").click();
-        }
         return wc.getPage(url);
+    }
+
+    public WebClient getWc() {
+        return wc;
     }
 
     /**
@@ -84,83 +68,64 @@ public class HtmlUnitTool {
     }
     public static void main(String[] argo){
 
-
-        HtmlPage page = null;
+        WebClient webClient = HtmlUnitTool.getHtmlTool().getWc();
         try {
-            page = HtmlUnitTool.getHtmlTool().getPage("http://wsdj.baic.gov.cn");
-//            wc.getWebConnection().getResponse(new Http);
+            WebRequest request = new WebRequest(new URL("http://wsdj.baic.gov.cn/system/login.do"));
+            request.setHttpMethod(HttpMethod.POST);
+            wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","yunsuo_session_verify","a88dc6ebf24b49e75be4150318c52343"));
+            wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","SESSION","670a76a8-dc38-4e8c-aacb-9e5fd2005151"));
+            List<NameValuePair> list = new ArrayList<NameValuePair>();
+
+            list.add(new NameValuePair("login_name","robbin1995"));
+            list.add(new NameValuePair("user_pwd","XWLZ2017"));
+            list.add(new NameValuePair("verify_code","JWJA"));
+
+            request.setRequestParameters(list);
+            request.setProxyHost("127.0.0.1");
+            request.setProxyPort(8888);
+            WebResponse response = webClient.getWebConnection().getResponse(request);
+
+            System.out.println(response.getContentAsString());
+
+            Set<Cookie> cookies = webClient.getCookieManager().getCookies();
+            Iterator it = cookies.iterator();
+            while (it.hasNext()){
+                Cookie cookie = (Cookie) it.next();
+                System.out.println(cookie.getName()+"======"+cookie.getValue());
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-       System.out.println(page.getWebResponse().getContentAsString());
 
 
+
+//        HtmlPage page = null;
+//        try {
+//            page = HtmlUnitTool.getHtmlTool().getPage("http://wsdj.baic.gov.cn");
+////            wc.getWebConnection().getResponse(new Http);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 //        if(page != null){
 //            DomElement login_name = page.getElementById("login_name");
 //            DomElement password = page.getElementById("user_pwd");
 //            DomElement verify_code = page.getElementById("verify_code");
 //
+//            login_name.setAttribute("value","robbin1995");
+//            password.setAttribute("value","XWLZ2017");
+//            verify_code.setAttribute("value","3J54");
 //
-//            String ret_code = "";
-//            HtmlImage image = (HtmlImage) page.getElementById("verify-code");
-//            try {
-//                ImageReader reader = image.getImageReader();
-//                BufferedImage bufferedImage = reader.read(0);
-//                ret_code = new Tesseract().doOCR(bufferedImage);
-//                ImageIO.write(bufferedImage,"jpg",new File("d:\\ttt.jpg"));
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            System.out.println(ret_code);
-//            //page.getElementById("verify-code").getAttribute("src").getBytes();
-//            login_name.setAttribute("value","robbin1995");//.setNodeValue("robbin1995");
-//            password.setAttribute("value","XWLZ2017");//.setNodeValue("XWLZ2017");
-//            verify_code.setAttribute("value",ret_code);
+//            wc.getCookieManager().clearCookies();
+//            wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","yunsuo_session_verify","a88dc6ebf24b49e75be4150318c52343"));
+//            wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","SESSION","185a1367-8cb0-48a8-b781-dd2ab5bd056a"));
 //
 //            try {
-//                HtmlPage pp = page.getElementById("btnCheck").click();
-////                Object pp =  page.executeJavaScript("login()").getJavaScriptResult();
-//                wc.waitForBackgroundJavaScript(3000l);
-//                System.out.println(pp.asText());
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-
-//            try {
-//                WebRequest request =  new WebRequest(new URL("http://wsdj.baic.gov.cn/system/login.do"));
-//                request.setHttpMethod(HttpMethod.POST);
-//                List<NameValuePair> list = new ArrayList<NameValuePair>();
-//                list.add(new NameValuePair("login_name","robbin1995"));
-//                list.add(new NameValuePair("user_pwd","XWLZ2017"));
-//                list.add(new NameValuePair("verify_code",ret_code));
-//
-//
-//                request.setRequestParameters(list);
-//                Map<String,String> map = request.getAdditionalHeaders();
-//                Set<Cookie> set = wc.getCookieManager().getCookies();
-//                StringBuilder sb = new StringBuilder();
-//                Iterator it = set.iterator();
-//                while (it.hasNext()){
-//                    Cookie c = (Cookie) it.next();
-//                    sb.append(c.toString()+";");
-//                }
-//
-//                request.getAdditionalHeaders().put("Cookie",sb.substring(0,sb.length() - 1));
-//                System.out.println("====="+wc.getWebConnection().getResponse(request).getContentAsString());
-//
+//                System.out.println("login page "+page.getElementById("btnCheck").click().getWebResponse().getContentAsString());
 //            } catch (IOException e) {
 //                e.printStackTrace();
 //            }
-
-
-//            ScriptResult sr = page.executeJavaScript("$('#btnCheck').click();");
-//            wc.waitForBackgroundJavaScript(30000);
-//
-//
-//            System.out.println(sr.getNewPage().getWebResponse().getContentAsString());
-//            System.out.println("*********/--------------");
-//            System.out.println("cookie"+wc.getCookieManager().getCookies().toString());
 //        }
     }
 }
