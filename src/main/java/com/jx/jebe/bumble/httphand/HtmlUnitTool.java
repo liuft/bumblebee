@@ -20,10 +20,12 @@ import java.net.URL;
 import java.util.*;
 
 public class HtmlUnitTool {
-    private static WebClient wc = new WebClient();
+    private static WebClient wc ;
     private static HtmlUnitTool tool = null;
     private static Object lock = new Object();
     private HtmlUnitTool(){
+//        wc = new WebClient(BrowserVersion.FIREFOX_45,"127.0.0.1",8888);
+        wc = new WebClient();
         wc.getOptions().setJavaScriptEnabled(true);
         wc.getOptions().setThrowExceptionOnScriptError(true);
         wc.getOptions().setCssEnabled(true);
@@ -33,6 +35,7 @@ public class HtmlUnitTool {
         wc.setAjaxController(new NicelyResynchronizingAjaxController());
         wc.getOptions().setTimeout(30000);
     }
+
     public static HtmlUnitTool getHtmlTool(){
         if(null == tool){
             synchronized (lock){
@@ -44,7 +47,28 @@ public class HtmlUnitTool {
         return tool;
     }
     public HtmlPage getPage(String url)throws Exception{
+        HtmlPage page = null;
+        try {
+            page = wc.getPage("http://wsdj.baic.gov.cn");
+//            wc.getWebConnection().getResponse(new Http);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(page != null){
+            DomElement login_name = page.getElementById("login_name");
+            DomElement password = page.getElementById("user_pwd");
+            DomElement verify_code = page.getElementById("verify_code");
 
+            login_name.setAttribute("value","robbin1995");
+            password.setAttribute("value","XWLZ2017");
+            verify_code.setAttribute("value","076T");
+
+            wc.getCookieManager().clearCookies();
+            wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","yunsuo_session_verify","d7055eb88596115ec4158311a6132673"));
+            wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","SESSION","b03e6cfb-f872-4f6b-89e0-24f9601df21d"));
+
+            page.getElementById("btnCheck").click();
+        }
         return wc.getPage(url);
     }
 
@@ -59,22 +83,13 @@ public class HtmlUnitTool {
         return enterpriseid;
     }
     public static void main(String[] argo){
-        WebClient wc = new WebClient(BrowserVersion.FIREFOX_45,"127.0.0.1",8888);
 
-        wc.getOptions().setJavaScriptEnabled(true);
-        wc.getOptions().setThrowExceptionOnScriptError(true);
-        wc.getOptions().setCssEnabled(true);
-
-        wc.getOptions().setRedirectEnabled(true);
-        wc.getCookieManager().setCookiesEnabled(true);
-        wc.setAjaxController(new NicelyResynchronizingAjaxController());
-        wc.getOptions().setTimeout(30000);
 
         HtmlPage page = null;
         try {
-            page = wc.getPage("http://wsdj.baic.gov.cn");
+            page = HtmlUnitTool.getHtmlTool().getPage("http://wsdj.baic.gov.cn");
 //            wc.getWebConnection().getResponse(new Http);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

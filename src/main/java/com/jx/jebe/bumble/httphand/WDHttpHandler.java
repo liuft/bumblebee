@@ -1,7 +1,11 @@
 package com.jx.jebe.bumble.httphand;
 
 import com.alibaba.fastjson.JSONObject;
+import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.DomNodeList;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.jx.jebe.bumble.beans.PersonExtEntity;
 import com.jx.jebe.bumble.buz.AccountBuz;
@@ -19,6 +23,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 
 import javax.imageio.ImageIO;
@@ -98,24 +103,19 @@ public class WDHttpHandler {
 
 
     public static void main(String[] args){
-        String index_url = "http://wsdj.baic.gov.cn/";
 
+        String checknumber = null;
         try {
-            HttpHelpers.getHttpHelpers().sendgetrequest(index_url);
+            checknumber = EnterpriseBuz.enterpriseBuz.getEntercheckedNameCode("908764");
+            String cardno = EnterpriseBuz.enterpriseBuz.getEntercheckedNameCerNo("908764");
+            System.out.println(HttpClientBuilder.class.getProtectionDomain().getCodeSource().getLocation());
+            WDHttpHandler.loadWDHandler().addnewsetup(checknumber,cardno,null);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String login_url = "http://wsdj.baic.gov.cn/system/login.do";
-        try {
-            System.out.println(HttpHelpers.getHttpHelpers().sendPostRequest(login_url,"{login_name:'robbin1995',user_pwd:'XWLZ2017',verify_code:'"+WDHttpHandler.loadWDHandler().readVerfiycode()+"'}"));
-//            Map<String,String> map = new HashMap<String, String>();
-//            map.put("login_name","robbin1995");
-//            map.put("user_pwd","XWLZ2017");
-//            map.put("verify_code",WDHttpHandler.loadWDHandler().readVerfiycode());
-//            System.out.println(HttpHelpers.getHttpHelpers().postForm(login_url,map));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+
+
     }
     private String readVerfiycode() {
         String retcode = "";
@@ -177,7 +177,21 @@ public class WDHttpHandler {
 
         //提交
         String enpriseid = HtmlUnitTool.getHtmlTool().sendSetup(page);
+        DomNodeList<HtmlElement> domNodeList = page.getElementById("notNoAndCerNoPanel").getElementsByTagName("span");
+        if(domNodeList != null && domNodeList.size() > 0){
+            Iterator it = domNodeList.iterator();
+            while (it.hasNext()){
+                HtmlElement element = (HtmlElement) it.next();
+                String style = element.getAttribute("class");
+                if(style.equals("button sure")){
+                    Page cpage = element.click();
 
+                    WebResponse response = cpage.getWebResponse();
+                    break;
+                }
+            }
+        }
+        page.getElementById("").click().getWebResponse();
         if(null != se){
             se.setEnter_id(enpriseid);
             se.setCurrent_step(1);

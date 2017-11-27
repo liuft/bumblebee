@@ -2,6 +2,7 @@ package com.jx.jebe.bumble.main;
 
 import com.jx.jebe.bumble.beans.TaskEntity;
 import com.jx.jebe.bumble.task.AbstractTask;
+import com.jx.jebe.bumble.task.WDTask;
 import com.jx.spat.gaea.server.bootstrap.Main;
 
 import java.util.*;
@@ -16,7 +17,9 @@ public class GSTaskMain extends Main{
     }
 
     private static void initTaskConfig() {
-        
+        TaskEntity te = new TaskEntity();
+        te.setClz(WDTask.class);
+        list.add(te);
     }
 
     public static void main(String[] args)throws Exception{

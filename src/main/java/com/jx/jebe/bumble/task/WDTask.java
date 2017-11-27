@@ -62,5 +62,12 @@ public class WDTask extends AbstractTask{
         Method  method = step_map.get(se.getCurrent_step()+"");
         method.invoke(WDHttpHandler.loadWDHandler(),se);
     }
+    public static void main(String[] args){
+        try {
+            new WDTask().runtask();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

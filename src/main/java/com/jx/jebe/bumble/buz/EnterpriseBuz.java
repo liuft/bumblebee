@@ -149,6 +149,6 @@ public class EnterpriseBuz {
      * @throws Exception
      */
     public String getEntercheckedNameCerNo(String enterpriseid)throws Exception{
-        return es.getExtValueByEnterpriseIdAndKey(enterpriseid,"checkedNameCerNo");
+        return "210402196411204114";//es.getExtValueByEnterpriseIdAndKey(enterpriseid,"checkedNameCerNo");
     }
 }
