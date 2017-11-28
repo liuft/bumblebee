@@ -33,7 +33,8 @@ public class EnterpriseBuz {
      * @throws Exception
      */
     public String getEntercheckedNameCode(String enterpriseid)throws Exception{
-        String str_temp = "(京怀)名称预核(内)字[2017]第0413843号";//es.getExtValueByEnterpriseIdAndKey(enterpriseid,"checkedNameCode");
+        //demo调试
+        String str_temp = "（京延）名称预核（内）字[2017]第0401390号";//es.getExtValueByEnterpriseIdAndKey(enterpriseid,"checkedNameCode");
         String ret = "";
         Pattern pattern = Pattern.compile("\\d{7}");
         Matcher matcher = pattern.matcher(str_temp);
@@ -149,6 +150,6 @@ public class EnterpriseBuz {
      * @throws Exception
      */
     public String getEntercheckedNameCerNo(String enterpriseid)throws Exception{
-        return "210402196411204114";//es.getExtValueByEnterpriseIdAndKey(enterpriseid,"checkedNameCerNo");
+        return "342623199401092523";//es.getExtValueByEnterpriseIdAndKey(enterpriseid,"checkedNameCerNo");
     }
 }

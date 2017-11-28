@@ -1,12 +1,13 @@
 package com.jx.jebe.bumble.httphand;
 
+import com.alibaba.fastjson.JSONObject;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlImage;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
-
+import com.jx.jebe.bumble.buz.EnterpriseBuz;
 
 
 import javax.imageio.ImageIO;
@@ -73,19 +74,37 @@ public class HtmlUnitTool {
             WebRequest request = new WebRequest(new URL("http://wsdj.baic.gov.cn/system/login.do"));
             request.setHttpMethod(HttpMethod.POST);
             wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","yunsuo_session_verify","a88dc6ebf24b49e75be4150318c52343"));
-            wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","SESSION","670a76a8-dc38-4e8c-aacb-9e5fd2005151"));
+            wc.getCookieManager().addCookie(new Cookie("wsdj.baic.gov.cn","SESSION","724881d0-640c-4bb3-9e5c-b7b64fb776c9"));
             List<NameValuePair> list = new ArrayList<NameValuePair>();
 
             list.add(new NameValuePair("login_name","robbin1995"));
             list.add(new NameValuePair("user_pwd","XWLZ2017"));
-            list.add(new NameValuePair("verify_code","JWJA"));
+            list.add(new NameValuePair("verify_code","TDTQ"));
 
             request.setRequestParameters(list);
             request.setProxyHost("127.0.0.1");
             request.setProxyPort(8888);
             WebResponse response = webClient.getWebConnection().getResponse(request);
 
-            System.out.println(response.getContentAsString());
+            JSONObject ret = JSONObject.parseObject(response.getContentAsString());
+            //demo 测试。生产中是反过来的，生产中从wdhttphandler调用htmlunit
+            if(ret.containsKey("result") && ret.getString("result").equals("3")){//登录成功
+
+                try {
+                    String checknumber = EnterpriseBuz.enterpriseBuz.getEntercheckedNameCode("908764");
+                    String cardno = EnterpriseBuz.enterpriseBuz.getEntercheckedNameCerNo("908764");
+                    WDHttpHandler.loadWDHandler().addnewsetupByajax(checknumber,cardno,null);
+//                    WDHttpHandler.loadWDHandler().basicInfo(null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+
+
+
+
 
             Set<Cookie> cookies = webClient.getCookieManager().getCookies();
             Iterator it = cookies.iterator();

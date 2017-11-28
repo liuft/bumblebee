@@ -1,7 +1,10 @@
 package com.jx.jebe.bumble.httphand;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
@@ -17,6 +20,7 @@ import com.jx.service.enterprise.entity.LvEnterpriseEntity;
 import com.jx.service.enterprise.entity.LvEnterprisePersonEntity;
 
 import net.sourceforge.tess4j.Tesseract;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -32,6 +36,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
+
 
 
 /**
@@ -59,6 +64,8 @@ public class WDHttpHandler {
     //预览页面
     private static  String pre_view_url = "http://wsdj.baic.gov.cn/ebaic/page/apply-wd/setup/preview.html";
 
+    //测试企业demo
+    private static String enter_id_demo = "3091657e30a84273a0aa34b96322374b";
 
     private static WDHttpHandler wdHttpHandler = null;
     private static Object lock = new Object();
@@ -146,9 +153,54 @@ public class WDHttpHandler {
         }
         return retcode;
     }
-
     /**
-     * 调用
+     * 通过异步请求去新建设立。
+     * @param checknum
+     * @param checkcardno
+     * @throws Exception
+     */
+    public String addnewsetupByajax(String checknum,String checkcardno,SetupTaskEnitty se)throws Exception{
+        String retid_id = "";
+        if(null == checknum || "".equals(checknum) || null == checkcardno || "".equals(checkcardno))
+            return retid_id;
+        String post_url = "http://wsdj.baic.gov.cn/cp/setup/checkin/getCatIdByEntInfo.do";
+        WebRequest request = new WebRequest(new URL(post_url), HttpMethod.POST);
+        //设置代理地址和端口为了fidller 监控
+        request.setProxyHost("127.0.0.1");
+        request.setProxyPort(8888);
+
+        String v_json = "{\"data\":[{\"name\":\"notNoAndCerNoPanel\",\"vtype\":\"formpanel\",\"data\":{\"notNo\":\""+checknum+"\",\"cerNo\":\""+checkcardno+"\"}}]}";
+        List<com.gargoylesoftware.htmlunit.util.NameValuePair> vp_list = new ArrayList<com.gargoylesoftware.htmlunit.util.NameValuePair>();
+        com.gargoylesoftware.htmlunit.util.NameValuePair parme = new com.gargoylesoftware.htmlunit.util.NameValuePair("postData",v_json);
+        vp_list.add(parme);
+
+        request.setRequestParameters(vp_list);
+        WebResponse response = HtmlUnitTool.getHtmlTool().getWc().getWebConnection().getResponse(request);
+        String ret_str_temp = response.getContentAsString();
+
+        System.out.println("ret_str_temp =============>"+ret_str_temp);
+        JSONObject retobj = JSONObject.parseObject(ret_str_temp);
+        System.out.println("--------------->"+retobj.toString());
+
+        if(null != retobj && retobj.containsKey("data")){//返回结果
+            JSONArray array = retobj.getJSONArray("data");
+            String enter_id_str = "";//工商局系统企业库id
+            for(int i= 0 ,len = array.size();i<len;i++){
+                JSONObject jjo = array.getJSONObject(i);
+                if(jjo.getString("name").equals("nameId")){
+                    enter_id_str = jjo.getString("data");
+                    break;
+                }
+            }
+            if(null != se && !enter_id_str.equals("")){
+                se.setEnter_id(enter_id_str);
+            }
+        }
+
+        return retid_id;
+    }
+    /**
+     * 通过按钮调用请求。click不稳定。也可以使用异步请求方式
      * @param checknum
      * @param checkcardno
      * @throws Exception
@@ -180,19 +232,19 @@ public class WDHttpHandler {
                 String style = element.getAttribute("class");
                 if(style.equals("button sure")){
                     Page cpage = element.click();
-
+                    Thread.sleep(5000l);//需要一些时间等待异步操作完成
                     WebResponse response = cpage.getWebResponse();
+                    System.out.println("click response is "+response.getContentAsString());
                     break;
                 }
             }
         }
-        page.getElementById("").click().getWebResponse();
         if(null != se){
             se.setEnter_id(enpriseid);
             se.setCurrent_step(1);
             WangdengBuz.wdbuz.updateTaskEntity(se);
         }
-        basicInfo(se);
+//        basicInfo(se);
         return enpriseid;
     }
 
@@ -204,29 +256,30 @@ public class WDHttpHandler {
      */
     public String basicInfo(SetupTaskEnitty se)throws Exception{
         String ret = "";
-        enterprise_basic_info_url = enterprise_basic_info_url + "?gid="+se.getEnter_id();
-
-        if(se == null)
-            return ret;
-
-        LvEnterpriseEntity lvEnterpriseEntity = EnterpriseBuz.enterpriseBuz.getEnterpriseBasicInfo(se.getSetup_enterprise_id());
+        //demo调试，se 为空。生产时放开校验
+//        if(se == null)
+//            return ret;
+//        enterprise_basic_info_url = enterprise_basic_info_url + "?gid="+se.getEnter_id();
+        enterprise_basic_info_url = enterprise_basic_info_url + "?gid=" + enter_id_demo;
+        LvEnterpriseEntity lvEnterpriseEntity = null;
+        //EnterpriseBuz.enterpriseBuz.getEnterpriseBasicInfo(se.getSetup_enterprise_id());//在调试过程中使用demo，生产中使用正常查询
 
 
 
         HtmlPage base_page = HtmlUnitTool.getHtmlTool().getPage(enterprise_basic_info_url);
         if(base_page != null){
-            //注册资本
-            base_page.getElementById("comp_j_12890644_1017_input").setNodeValue(lvEnterpriseEntity.getRegCapital());
-            //营业期限
-            base_page.getElementById("comp_j_05158801_1018_out").setNodeValue(EnterpriseBuz.enterpriseBuz.getBussinessDuration(lvEnterpriseEntity.getEnterpriseId()));
+            //注册资本 lvEnterpriseEntity.getRegCapital()
+            base_page.getElementById("comp_j_12890644_1017_input").setNodeValue("100");
+            //营业期限EnterpriseBuz.enterpriseBuz.getBussinessDuration(lvEnterpriseEntity.getEnterpriseId())
+            base_page.getElementById("comp_j_05158801_1018_out").setNodeValue("20");
             //是否属于特殊行业
             base_page.getElementById("comp_j_75387240_1019_text").setNodeValue("不是特殊行业");
-            //住所(经营场所)
-            base_page.getElementById("comp_j_51043267_1021_input").setNodeValue(lvEnterpriseEntity.getAddressFormat());
-            //生成经营地
-            base_page.getElementById("comp_j_50507866_1023_input").setNodeValue(lvEnterpriseEntity.getAddressFormat());
-            //住所产权人
-            base_page.getElementById("comp_j_91287559_1024_input").setNodeValue(EnterpriseBuz.enterpriseBuz.getOwenerName(lvEnterpriseEntity.getEnterpriseId()));
+            //住所(经营场所) lvEnterpriseEntity.getAddressFormat()
+            base_page.getElementById("comp_j_51043267_1021_input").setNodeValue("北京市海淀区海淀西大街36号5层515-01");
+            //生成经营地 lvEnterpriseEntity.getAddressFormat()
+            base_page.getElementById("comp_j_50507866_1023_input").setNodeValue("北京市海淀区海淀西大街36号5层515-01");
+            //住所产权人 EnterpriseBuz.enterpriseBuz.getOwenerName(lvEnterpriseEntity.getEnterpriseId())
+            base_page.getElementById("comp_j_91287559_1024_input").setNodeValue("北京嘉成优创企业文化有限公司");
             //住所产权类型
             base_page.getElementById("comp_j_37967443_1025_text").setNodeValue("有房产证");
             //是否在以下区域
@@ -238,9 +291,12 @@ public class WDHttpHandler {
             //执照副本数
             base_page.getElementById("comp_j_55509076_1032_input").setNodeValue("1");
 
-            //经营范围
-            base_page.getElementById("comp_j_84941608_1040_input").setNodeValue(lvEnterpriseEntity.getOperatingRange());
+            String range_demo = "技术开发、技术推广、技术咨询、技术服务、技术转让；应用软件服务；软件开发；软件咨询；产品设计；模型设计；包装装潢设计；经济贸易咨询；公共关系服务；会议服务；工程和技术研究与试验发展；数据处理（数据处理中的银行卡中心、PUE值在1.5以上的云计算数据中心除外）";
+            //经营范围  lvEnterpriseEntity.getOperatingRange()
+            base_page.getElementById("comp_j_84941608_1040_input").setNodeValue(range_demo);
             base_page.getElementById("comp_j_84941608_1040_input").blur();
+
+            base_page.getElementById("applySetupBasic_query_button").click();//保存按钮s
 
         }
 
@@ -250,7 +306,7 @@ public class WDHttpHandler {
             se.setCurrent_step(2);
             WangdengBuz.wdbuz.updateTaskEntity(se);
         }
-        shareHolderInfo(se);
+//        shareHolderInfo(se);
         return ret;
     }
 
