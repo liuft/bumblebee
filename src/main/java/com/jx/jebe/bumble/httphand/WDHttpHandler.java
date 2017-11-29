@@ -249,6 +249,169 @@ public class WDHttpHandler {
     }
 
     /**
+     * 基本消息的异步请求设立
+     * @param se
+     * @return
+     * @throws Exception
+     */
+    public String basicInfoAjax(SetupTaskEnitty se)throws Exception{
+        String ret = "";
+        //demo调试，se 为空。生产时放开校验
+//        if(se == null)
+//            return ret;
+        //        enterprise_basic_info_url = enterprise_basic_info_url + "?gid="+se.getEnter_id();
+        enterprise_basic_info_url = enterprise_basic_info_url + "?gid=" + enter_id_demo;
+        LvEnterpriseEntity lvEnterpriseEntity = null;
+        //在调试过程中使用demo，生产中使用正常查询
+        //EnterpriseBuz.enterpriseBuz.getEnterpriseBasicInfo(se.getSetup_enterprise_id());
+
+        HtmlPage base_page = HtmlUnitTool.getHtmlTool().getPage(enterprise_basic_info_url);
+        if(base_page != null){
+            DomElement dom = base_page.getElementById("comp_j_65067389_1002_editor");
+
+            String entName = dom == null?"":dom.getTextContent();
+            //enttype2 企业类型
+            String entType2 = base_page.getElementById("comp_j_77050178_1011_input").getAttribute("value");
+            //bizhong
+            String capCur = base_page.getElementById("comp_j_06446513_1012_input").getAttribute("value");
+            //是否特殊行业
+            String isIndustrycoNegative = "0";
+            //是否负面清单
+            DomElement yel = base_page.getElementById("comp_j_80630016_1014_box_0");
+            DomElement nel = base_page.getElementById("comp_j_80630016_1014_box_1");
+            if(yel.getAttribute("checked") != null && yel.getAttribute("checked").equals("checked")){
+                isIndustrycoNegative = "0";
+            }else {
+                isIndustrycoNegative = "1";
+            }
+            //注册资本 lvEnterpriseEntity.getRegCapital()
+            String regCap = "100";
+            //营业期限 EnterpriseBuz.enterpriseBuz.getBussinessDuration(lvEnterpriseEntity.getEnterpriseId())
+            String tradeTerm = "20";
+            //是否特殊行业
+            String specIndustry = "0";
+            //区域 海淀110108 朝阳 110105 东城110101 西城110102 丰台110106 石景山110107 通州110112 大兴区110115 顺义区110113 昌平区110114
+            //房山110111 门头沟区110109 平谷区110117 怀柔区110116 密云区110228 延庆区110229 北京经济技术开发区110130
+            String domDistrict = "110108";
+            //住所(经营场所) lvEnterpriseEntity.getAddressFormat()
+            String domDetail = "北京市海淀区海淀西大街36号5层515-01";
+            //生产经营
+            String proLocOther = "北京市海淀区海淀西大街36号5层515-01";
+            //生成经营地 lvEnterpriseEntity.getAddressFormat()
+            String proLocCity = "110108";
+
+            //住所（产权人）EnterpriseBuz.enterpriseBuz.getOwenerName(lvEnterpriseEntity.getEnterpriseId())
+            String domOwner = "北京嘉成优创企业文化有限公司";
+            //住所产权类型
+            String domOwnType = "1";
+            //住所提供方式
+            String domProRight =   "02";
+            //住所使用期限
+            String domTerm = "1";
+            //是否特殊区域
+            String specArea = "0";
+            //营业面积
+            String domAcreage = "3";
+            //房屋用途
+            String domUsageType = "商业";
+            //是否市级国有资产监督管理机构履行出资人职责的公司以及该公司设立的控股50%以上的公司
+            String sgzwFlag = "0";
+            //经营范围
+            String customScope = "技术开发、技术推广、技术咨询、技术服务、技术转让；应用软件服务；软件开发；软件咨询；产品设计；模型设计；包装装潢设计；经济贸易咨询；公共关系服务；会议服务；工程和技术研究与试验发展；数据处理（数据处理中的银行卡中心、PUE值在1.5以上的云计算数据中心除外）";
+            //副本书
+            String copyNo = "1";
+
+            String suffix = "企业依法自主选择经营项目，开展经营活动；依法须经批准的项目，经相关部门批准后依批准的内容开展经营活动；不得从事本市产业政策禁止和限制类项目的经营活动。";
+
+            JSONObject form_json = new JSONObject();
+            form_json.put("name","applySetupBasic_Form");
+            form_json.put("vtype","formpanel");
+            JSONObject form_data = new JSONObject();
+            form_data.put("gid",enter_id_demo);
+            form_data.put("entName",entName);
+            form_data.put("entType2",entType2);
+            form_data.put("capCur",capCur);
+            form_data.put("conGro","");
+            form_data.put("isIndustrycoNegative",isIndustrycoNegative);
+            form_data.put("insForm","");
+            form_data.put("ssmjgfFlag","");
+            form_data.put("regCap",regCap);
+            form_data.put("tradeTerm",tradeTerm);
+            form_data.put("specIndustry",specIndustry);
+            form_data.put("domDistrict",domDistrict);
+            form_data.put("domDetail",domDetail);
+            form_data.put("proLocCity",proLocCity);
+            form_data.put("proLocOther",proLocOther);
+            form_data.put("domOwner",domOwner);
+            form_data.put("domOwnType",domOwnType);
+            form_data.put("domProRight",domProRight);
+            form_data.put("domTerm",domTerm);
+            form_data.put("specArea",specArea);
+            form_data.put("domAcreage",domAcreage);
+            form_data.put("domUsageType",domUsageType);
+            form_data.put("sgzwFlag",sgzwFlag);
+            form_data.put("copyNo",copyNo);
+            form_data.put("sswwFlag","");
+            form_data.put("approve-main","");
+            form_data.put("approve-license","");
+            form_data.put("approveScope","");
+            form_data.put("approveCustom","");
+            form_data.put("approveSuffix","");
+            form_json.put("data",form_data);
+
+            JSONObject gid_json = new JSONObject();
+            gid_json.put("vtype","attr");
+            gid_json.put("name","gid");
+            gid_json.put("data",enter_id_demo);
+
+            JSONObject scop_json = new JSONObject();
+            scop_json.put("vtype","attr");
+            scop_json.put("name","scopeJson");
+            JSONObject scop_data = new JSONObject();
+            scop_data.put("type","6");
+            scop_data.put("scope",new JSONArray());
+            scop_data.put("suffix",suffix);
+            scop_data.put("customScope",customScope);
+            scop_json.put("data",scop_data);
+
+            JSONObject bus_scop = new JSONObject();
+            bus_scop.put("vtype","attr");
+            bus_scop.put("name","businessScope");
+            bus_scop.put("data",customScope+"("+suffix+")");
+
+            JSONObject zre_json = new JSONObject();
+            zre_json.put("name","zreInputFlag");
+            zre_json.put("vtype","attr");
+            zre_json.put("data","");
+
+            JSONObject data_json = new JSONObject();
+            JSONArray array = new JSONArray();
+            array.add(form_json);
+            array.add(zre_json);
+            array.add(scop_json);
+            array.add(bus_scop);
+            array.add(gid_json);
+            data_json.put("data",array);
+
+            String url = "http://wsdj.baic.gov.cn/ebaic/torch/service.do?fid=applySetupBasic&gid=3091657e30a84273a0aa34b96322374b";
+            WebRequest request = new WebRequest(new URL(url),HttpMethod.POST);
+            List<com.gargoylesoftware.htmlunit.util.NameValuePair> plist = new ArrayList<com.gargoylesoftware.htmlunit.util.NameValuePair>();
+            com.gargoylesoftware.htmlunit.util.NameValuePair pppd = new com.gargoylesoftware.htmlunit.util.NameValuePair("postData",data_json.toString());
+
+
+            request.setRequestParameters(plist);
+            request.setProxyPort(8888);
+            request.setProxyHost("127.0.0.1");
+            WebResponse response = HtmlUnitTool.getHtmlTool().getWc().getWebConnection().getResponse(request);
+
+            if(response != null){
+                response.getContentAsString();
+            }
+        }
+        return "";
+
+    }
+    /**
      * 基本信息
      * @param se
      * @return
@@ -270,7 +433,7 @@ public class WDHttpHandler {
         if(base_page != null){
             //注册资本 lvEnterpriseEntity.getRegCapital()
             base_page.getElementById("comp_j_12890644_1017_input").setNodeValue("100");
-            //营业期限EnterpriseBuz.enterpriseBuz.getBussinessDuration(lvEnterpriseEntity.getEnterpriseId())
+            //营业期限 EnterpriseBuz.enterpriseBuz.getBussinessDuration(lvEnterpriseEntity.getEnterpriseId())
             base_page.getElementById("comp_j_05158801_1018_out").setNodeValue("20");
             //是否属于特殊行业
             base_page.getElementById("comp_j_75387240_1019_text").setNodeValue("不是特殊行业");
