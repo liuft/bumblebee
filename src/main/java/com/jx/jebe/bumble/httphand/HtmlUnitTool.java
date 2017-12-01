@@ -57,6 +57,25 @@ public class HtmlUnitTool {
         return wc;
     }
 
+
+    /**
+     * 针对异步请求的封装
+     * @param datastr 请求的json参数
+     *@param url 请求的url
+     * @return
+     * @throws Exception
+     */
+    public String sentAajaxRequest(String url,String keyname,String datastr)throws Exception{
+        String ret = "";
+        WebRequest request = new WebRequest(new URL(url),HttpMethod.POST);
+        List<NameValuePair> plist = new ArrayList<NameValuePair>();
+        NameValuePair np = new NameValuePair("","");
+        WebResponse response = getHtmlTool().getWc().getWebConnection().getResponse(request);
+        if(null != response){
+            ret = response.getContentAsString();
+        }
+        return ret;
+    }
     /**
      * 设立提交申请
      * @param page
