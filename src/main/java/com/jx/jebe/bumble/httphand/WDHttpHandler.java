@@ -1,5 +1,6 @@
 package com.jx.jebe.bumble.httphand;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.gargoylesoftware.htmlunit.HttpMethod;
@@ -25,6 +26,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -473,6 +475,10 @@ public class WDHttpHandler {
         return ret;
     }
 
+    public String shareHolderInfoAjax(SetupTaskEnitty setupTaskEnitty)throws Exception{
+        String ret = "";
+        return ret;
+    }
     /**
      * 股东信息
      * @param se
@@ -481,7 +487,6 @@ public class WDHttpHandler {
      */
     public String shareHolderInfo(SetupTaskEnitty se)throws Exception{
         String ret = "";
-
 
         List<LvEnterprisePersonEntity> slist = EnterpriseBuz.enterpriseBuz.getShareHolderList(se.getSetup_enterprise_id());
 
@@ -555,6 +560,61 @@ public class WDHttpHandler {
     }
 
     /**
+     * 企业联系人异步请求
+     * @param setupTaskEnitty
+     * @return
+     * @throws Exception
+     */
+    public String contactInfoAjax(SetupTaskEnitty setupTaskEnitty)throws Exception{
+        String ret = "";
+        String contacter_url = "http://wsdj.baic.gov.cn/ebaic/torch/service.do?fid=applySetupContact&gid="+setupTaskEnitty.getEnter_id();
+        JSONObject data_json = new JSONObject();
+
+        JSONObject contacter_data = new JSONObject();//企业联系人
+        contacter_data.put("gid", setupTaskEnitty.getEnter_id());
+        contacter_data.put("name","巫晓东");
+        contacter_data.put("textName","巫晓东");
+        contacter_data.put("cerType","1");//证件类型
+        contacter_data.put("cerNo","110108196903253711");//身份证号码
+        contacter_data.put("mobile","13501169512");//手机号码
+        contacter_data.put("tel","");//固定电话
+
+        JSONObject contacter = new JSONObject();
+        contacter.put("name","applySetupEntContact_Form ");
+        contacter.put("vtype","formpanel");
+        contacter.put("data",contacter_data);
+
+        JSONObject frcontacter = new JSONObject();//财务联系人
+
+        JSONObject frcontacter_data = new JSONObject();
+        frcontacter_data.put("gid",setupTaskEnitty.getEnter_id());
+        frcontacter_data.put("name","程浩");//财务联系人姓名
+        frcontacter_data.put("textFname","程浩");//财务联系人姓名
+        frcontacter_data.put("fcerType","1");//证件类型
+        frcontacter_data.put("cerNo","110102197805200014");//证件号码
+        frcontacter_data.put("mobile","13910757966");//联系电话
+
+        frcontacter.put("data",frcontacter_data);
+        frcontacter.put("name","applySetupFrContact_Form");
+        frcontacter.put("vtype","formpanel");
+
+        JSONArray d_arry = new JSONArray();
+        d_arry.add(contacter);
+        d_arry.add(frcontacter);
+
+        data_json.put("data",d_arry);
+
+        String res = HtmlUnitTool.getHtmlTool().sentAajaxRequest(contacter_url,"postData",data_json.toString());
+
+        if(res != null ){
+            JSONObject jjo = JSONObject.parseObject(res);
+
+        }
+
+        return ret;
+    }
+
+    /**
      * 企业联系人
      * @param se
      * @return
@@ -587,6 +647,11 @@ public class WDHttpHandler {
         if(se != null){
             se.setCurrent_step(5);
             WangdengBuz.wdbuz.updateTaskEntity(se);
+
+
+
+
+
         }
 
 
@@ -595,6 +660,20 @@ public class WDHttpHandler {
         return ret;
     }
 
+    /**
+     * 文件上传信息 异步请求
+     * @param setupTaskEnitty
+     * @return
+     * @throws Exception
+     */
+    public String fileUploadInfoAjax(SetupTaskEnitty setupTaskEnitty)throws Exception{
+        String ret = "";
+        WebRequest webRequest = new WebRequest(new URL(""),HttpMethod.POST);
+        FileBody fb = null;
+
+        HtmlUnitTool.getHtmlTool().getWc().getWebConnection().getResponse(webRequest);
+        return ret;
+    }
     /**
      * 文件上传信息
      * @param se
